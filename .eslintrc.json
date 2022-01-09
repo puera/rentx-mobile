@@ -24,6 +24,7 @@
         "prettier"
     ],
     "rules": {
+      "react/jsx-no-bind": "off",
       "react/require-default-props": "off",
       "import/no-extraneous-dependencies": "off",
       "camelcase": "off",

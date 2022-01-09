@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { RectButtonProps } from 'react-native-gesture-handler';
 import {
   Container,
   Details,
@@ -22,11 +23,11 @@ type CarProps = {
     price: number;
   };
   thumbnail: string;
-};
+} & RectButtonProps;
 
-export function Car({ name, brand, rent, thumbnail }: CarProps) {
+export function Car({ name, brand, rent, thumbnail, ...rest }: CarProps) {
   return (
-    <Container>
+    <Container {...rest}>
       <Details>
         <Brand>{brand}</Brand>
         <Name>{name}</Name>

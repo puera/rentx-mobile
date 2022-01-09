@@ -1,5 +1,6 @@
-import { StatusBar } from 'react-native';
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'react-native';
 
 import { Container, CarList } from './styles';
 import { Header } from '../../components/Header';
@@ -16,6 +17,12 @@ const carData = {
 };
 
 export function Home() {
+  const navigation = useNavigation();
+
+  function handleCarDetails() {
+    navigation.navigate('CarDetails');
+  }
+
   return (
     <Container>
       <StatusBar
@@ -34,6 +41,7 @@ export function Home() {
             name={carData.name}
             rent={carData.rent}
             thumbnail={carData.thumbnail}
+            onPress={handleCarDetails}
           />
         )}
       />
