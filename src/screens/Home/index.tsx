@@ -1,7 +1,7 @@
 import { StatusBar } from 'react-native';
 import React from 'react';
 
-import { Container } from './styles';
+import { Container, CarList } from './styles';
 import { Header } from '../../components/Header';
 import { Car } from '../../components/Car';
 
@@ -24,17 +24,18 @@ export function Home() {
         translucent
       />
       <Header />
-      <Car
-        brand={carData.brand}
-        name={carData.name}
-        rent={carData.rent}
-        thumbnail={carData.thumbnail}
-      />
-      <Car
-        brand={carData.brand}
-        name={carData.name}
-        rent={carData.rent}
-        thumbnail={carData.thumbnail}
+
+      <CarList
+        data={[1, 2, 3, 4, 5, 6, 7]}
+        keyExtractor={(item) => String(item)}
+        renderItem={({ item }) => (
+          <Car
+            brand={carData.brand}
+            name={carData.name}
+            rent={carData.rent}
+            thumbnail={carData.thumbnail}
+          />
+        )}
       />
     </Container>
   );
