@@ -3,6 +3,7 @@
     "name": "rentx-mobile",
     "slug": "rentx-mobile",
     "version": "1.0.0",
+    "scheme": "rentx-mobile",
     "assetBundlePatterns": [
       "**/*"
     ]
