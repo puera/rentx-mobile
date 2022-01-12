@@ -6,7 +6,11 @@
     "scheme": "rentx-mobile",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#1B1B1F"
+    }
   },
   "name": "rentx-mobile"
 }
