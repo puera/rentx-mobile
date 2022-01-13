@@ -51,7 +51,10 @@ export function Splash() {
   });
 
   const startApp = useCallback(() => {
-    navigation.navigate('Home');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Home' }],
+    });
   }, [navigation]);
 
   useEffect(() => {

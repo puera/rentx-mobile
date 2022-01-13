@@ -32,7 +32,7 @@ export const Message = styled.Text`
     color: ${theme.colors.text_detail};
     font-family: ${theme.fonts.primary_400};
     text-align: center;
-    line-height: ${RFValue(25)}px;
+    line-height: ${RFValue(24)}px;
 
     margin-top: 16px;
   `}

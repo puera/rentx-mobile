@@ -93,7 +93,10 @@ export function CarDetails() {
         ]}
       >
         <Header>
-          <BackButton onPress={() => navigation.goBack()} />
+          <BackButton
+            style={{ zIndex: 1 }}
+            onPress={() => navigation.goBack()}
+          />
         </Header>
         <Animated.View style={sliderCarsStyleAnimation}>
           <CarImages>
