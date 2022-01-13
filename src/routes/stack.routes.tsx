@@ -8,8 +8,10 @@ import { SchedulingDetails } from '../screens/SchedulingDetails';
 import { SchedulingComplete } from '../screens/SchedulingComplete';
 import { MyCars } from '../screens/MyCars';
 import { Splash } from '../screens/Splash';
+import { SignIn } from '../screens/SignIn';
 
 export interface AppRoutesParamList {
+  SignIn: undefined;
   Home: undefined;
   CarDetails: {
     car: CarsDTO;
@@ -35,6 +37,7 @@ export function StackRoutes() {
         headerShown: false,
       }}
     >
+      <Screen name="SignIn" component={SignIn} />
       <Screen name="Splash" component={Splash} />
       <Screen
         name="Home"

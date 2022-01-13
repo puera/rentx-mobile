@@ -53,7 +53,7 @@ export function Splash() {
   const startApp = useCallback(() => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Home' }],
+      routes: [{ name: 'SignIn' }],
     });
   }, [navigation]);
 
