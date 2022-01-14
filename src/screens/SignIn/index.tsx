@@ -9,31 +9,35 @@ import {
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { useTheme } from 'styled-components';
+import { useNavigation } from '@react-navigation/native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { InputPassword } from '../../components/InputPassword';
 
 import { Container, Header, SubTitle, Title, Form, Footer } from './styles';
+import { formatMessagesYup } from '../../utils/formatMessagesYup';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const theme = useTheme();
+  const navigation = useNavigation();
 
   async function handleSignIn() {
     try {
       const schema = Yup.object().shape({
         email: Yup.string()
-          .required('E-mail obrigatório')
+          .required('O e-mail é obrigatório')
           .email('Digite um e-mail válido'),
         password: Yup.string().required('A senha é obrigatória'),
       });
 
-      await schema.validate({ email, password });
+      await schema.validate({ email, password }, { abortEarly: false });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
-        Alert.alert('Opa', error.message);
+        const message = formatMessagesYup(error);
+        Alert.alert('Opa!', message);
       } else {
         Alert.alert(
           'Erro na autenticação',
@@ -90,7 +94,7 @@ export function SignIn() {
             </View>
             <Button
               title="Criar conta gratuita"
-              onPress={() => {}}
+              onPress={() => navigation.navigate('SignUpFirstStep')}
               light
               color={theme.colors.background_secondary}
               enabled
