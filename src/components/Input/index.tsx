@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Feather } from '@expo/vector-icons';
 
 import { useTheme } from 'styled-components';
-import { TextInputProps } from 'react-native';
+import { TextInput, TextInputProps } from 'react-native';
 import { Container, IconContainer, InputText } from './styles';
 
 interface InputProps extends TextInputProps {
   iconName: React.ComponentProps<typeof Feather>['name'];
 }
 
-export function Input({ iconName, value, ...rest }: InputProps) {
+interface InputRef {
+  focus(): void;
+}
+
+const InputForward: React.ForwardRefRenderFunction<InputRef, InputProps> = (
+  { iconName, value, ...rest },
+  ref,
+) => {
+  const inputElementRef = useRef<TextInput>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
@@ -21,6 +34,12 @@ export function Input({ iconName, value, ...rest }: InputProps) {
     setIsFocused(false);
     setIsFilled(!!value);
   }
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputElementRef.current.focus();
+    },
+  }));
 
   const theme = useTheme();
   return (
@@ -36,6 +55,7 @@ export function Input({ iconName, value, ...rest }: InputProps) {
       </IconContainer>
 
       <InputText
+        ref={inputElementRef}
         onFocus={handleFocus}
         onBlur={handleBlur}
         isFocused={isFocused}
@@ -43,4 +63,6 @@ export function Input({ iconName, value, ...rest }: InputProps) {
       />
     </Container>
   );
-}
+};
+
+export const Input = forwardRef(InputForward);

@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { Feather } from '@expo/vector-icons';
 
 import { useTheme } from 'styled-components';
-import { TextInputProps } from 'react-native';
+import { TextInput, TextInputProps } from 'react-native';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { Container, IconContainer, InputText } from './styles';
 
@@ -10,7 +16,16 @@ interface InputProps extends TextInputProps {
   iconName: React.ComponentProps<typeof Feather>['name'];
 }
 
-export function InputPassword({ iconName, value, ...rest }: InputProps) {
+interface InputRef {
+  focus(): void;
+}
+
+const InputPasswordFoward: ForwardRefRenderFunction<InputRef, InputProps> = (
+  { iconName, value, ...rest },
+  ref,
+) => {
+  const inputElementRef = useRef<TextInput>(null);
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
@@ -26,6 +41,12 @@ export function InputPassword({ iconName, value, ...rest }: InputProps) {
     setIsFilled(!!value);
   }
 
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputElementRef.current.focus();
+    },
+  }));
+
   return (
     <Container>
       <IconContainer isFocused={isFocused}>
@@ -39,6 +60,7 @@ export function InputPassword({ iconName, value, ...rest }: InputProps) {
       </IconContainer>
 
       <InputText
+        ref={inputElementRef}
         onFocus={handleFocus}
         onBlur={handleBlur}
         secureTextEntry={isPasswordVisible}
@@ -59,4 +81,6 @@ export function InputPassword({ iconName, value, ...rest }: InputProps) {
       </BorderlessButton>
     </Container>
   );
-}
+};
+
+export const InputPassword = forwardRef(InputPasswordFoward);

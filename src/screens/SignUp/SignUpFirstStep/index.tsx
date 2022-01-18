@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
-import React, { useState } from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Alert, Keyboard, KeyboardAvoidingView, TextInput } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { BackButton } from '../../../components/BackButton';
 import { Bullet } from '../../../components/Bullet';
@@ -23,6 +23,9 @@ export function SignUpFirstStep() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [cnh, setCnh] = useState('');
+
+  const emailRef = useRef<TextInput>(null);
+  const cnhRef = useRef<TextInput>(null);
 
   const navigation = useNavigation();
 
@@ -69,20 +72,33 @@ export function SignUpFirstStep() {
               iconName="user"
               placeholder="Nome"
               onChangeText={setName}
+              autoCapitalize="words"
+              autoCorrect={false}
               value={name}
+              returnKeyType="next"
+              onSubmitEditing={emailRef.current?.focus}
             />
             <Input
+              ref={emailRef}
               iconName="mail"
               placeholder="E-mail"
               onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
               value={email}
+              returnKeyType="next"
+              onSubmitEditing={cnhRef.current?.focus}
             />
             <Input
+              ref={cnhRef}
               iconName="credit-card"
               placeholder="CNH"
               keyboardType="numeric"
               onChangeText={setCnh}
               value={cnh}
+              returnKeyType="send"
+              onSubmitEditing={handleNextStep}
             />
           </Form>
 

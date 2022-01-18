@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
   StatusBar,
+  TextInput,
   View,
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { useTheme } from 'styled-components';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { InputPassword } from '../../components/InputPassword';
@@ -18,6 +19,8 @@ import { Container, Header, SubTitle, Title, Form, Footer } from './styles';
 import { formatMessagesYup } from '../../utils/formatMessagesYup';
 
 export function SignIn() {
+  const passwordRef = useRef<TextInput>(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -48,7 +51,7 @@ export function SignIn() {
   }
 
   return (
-    <KeyboardAvoidingView behavior="position" enabled>
+    <KeyboardAvoidingView behavior="position">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Container>
           <StatusBar
@@ -72,13 +75,18 @@ export function SignIn() {
                 autoCorrect={false}
                 autoCapitalize="none"
                 onChangeText={setEmail}
+                returnKeyType="next"
+                onSubmitEditing={passwordRef.current?.focus}
                 value={email}
               />
             </View>
             <InputPassword
+              ref={passwordRef}
               iconName="lock"
               placeholder="Senha"
               onChangeText={setPassword}
+              returnKeyType="send"
+              onSubmitEditing={handleSignIn}
               value={password}
             />
           </Form>
