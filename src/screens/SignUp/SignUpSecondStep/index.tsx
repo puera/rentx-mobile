@@ -10,7 +10,7 @@ import { Bullet } from '../../../components/Bullet';
 import { Button } from '../../../components/Button';
 
 import { InputPassword } from '../../../components/InputPassword';
-import { SignUpSecondStepProps } from '../../../routes/stack.routes';
+import { SignUpSecondStepProps } from '../../../routes/app.stack.routes';
 import { api } from '../../../services/api';
 
 import {

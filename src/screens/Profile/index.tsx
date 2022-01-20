@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
 import {
@@ -32,18 +33,32 @@ import { InputPassword } from '../../components/InputPassword';
 import { Button } from '../../components/Button';
 
 export function Profile() {
+  const { user, signOut } = useAuth();
+
   const [option, setOption] = useState<'dataEdit' | 'passwordEdit'>('dataEdit');
+  const [avatar, setAvatar] = useState(user.avatar);
+  const [name, setName] = useState(user.name);
+  const [driverLicense, setDriverLicense] = useState(user.driver_license);
 
   const theme = useTheme();
   const navigation = useNavigation();
-  const { user, signOut } = useAuth();
 
   function handleOptionChange(optionSelected: 'dataEdit' | 'passwordEdit') {
     setOption(optionSelected);
   }
 
   async function handleChangeAvatar() {
-    console.log('chegou aqui');
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      const { uri } = result as ImagePicker.ImageInfo;
+      setAvatar(uri);
+    }
   }
 
   async function handleSignOut() {
@@ -74,8 +89,8 @@ export function Profile() {
               </LogoutButton>
             </HeaderTop>
             <PhotoContainer>
-              {user.avatar ? (
-                <Photo source={{ uri: user.avatar }} />
+              {avatar ? (
+                <Photo source={{ uri: avatar }} />
               ) : (
                 <Photo
                   resizeMode="contain"
@@ -84,7 +99,7 @@ export function Profile() {
                   }}
                 />
               )}
-              <PhotoButton onPress={() => console.log('photo')}>
+              <PhotoButton onPress={handleChangeAvatar}>
                 <Feather name="camera" size={24} color={theme.colors.shape} />
               </PhotoButton>
             </PhotoContainer>
@@ -113,6 +128,7 @@ export function Profile() {
                   placeholder="Nome"
                   autoCorrect={false}
                   defaultValue={user.name}
+                  onChangeText={setName}
                 />
                 <Input
                   iconName="mail"
@@ -124,6 +140,7 @@ export function Profile() {
                   placeholder="CNH"
                   keyboardType="numeric"
                   defaultValue={user.driver_license}
+                  onChangeText={setDriverLicense}
                 />
               </Section>
             ) : (

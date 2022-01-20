@@ -5,12 +5,15 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import axios from 'axios';
+import { Alert } from 'react-native';
 import { database } from '../database';
 import { api } from '../services/api';
 import { User as ModelUser } from '../database/models/User';
 
 interface User {
   id: string;
+  user_id: string;
   email: string;
   name: string;
   driver_license: string;
@@ -45,6 +48,8 @@ export function AuthProvider({ children }: AuthContextProps) {
 
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
 
+      let userCreated: User;
+
       const userCollection = database.get<ModelUser>('users');
       await database.write(async () => {
         await userCollection.create((newUser) => {
@@ -54,20 +59,48 @@ export function AuthProvider({ children }: AuthContextProps) {
           newUser.avatar = user.avatar;
           newUser.driver_license = user.driver_license;
           newUser.token = token;
+
+          userCreated = {
+            id: newUser.id,
+            user_id: newUser.user_id,
+            name: newUser.name,
+            email: newUser.email,
+            avatar: newUser.avatar,
+            driver_license: newUser.driver_license,
+            token: newUser.token,
+          };
         });
       });
 
-      setData({ ...user, token });
+      setData({ ...userCreated, token });
     } catch (error) {
-      throw new Error(error);
+      if (axios.isAxiosError(error)) {
+        if (
+          error.response.data.message.toLowerCase() ===
+          'email or password incorret!'
+        ) {
+          Alert.alert('Opa!', 'Digite corretamente seu e-mail e senha');
+        }
+      } else {
+        Alert.alert(
+          'Erro na autenticação',
+          'Algum problema aconteceu , tente novamente mais tarde',
+        );
+      }
     }
   }
 
   async function signOut() {
-    await database.write(async () => {
-      await database.unsafeResetDatabase();
-    });
-    setData({} as User);
+    try {
+      const userCollection = database.get<ModelUser>('users');
+      await database.write(async () => {
+        const userSelected = await userCollection.find(data.id);
+        await userSelected.destroyPermanently();
+      });
+      setData({} as User);
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
   useEffect(() => {
@@ -78,6 +111,7 @@ export function AuthProvider({ children }: AuthContextProps) {
       if (response.length > 0) {
         const userData = response[0]._raw as unknown as User;
         api.defaults.headers.common.Authorization = `Bearer ${userData.token}`;
+
         setData(userData);
       }
     })();

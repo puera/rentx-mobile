@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import * as Yup from 'yup';
 import {
   Alert,
@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { useTheme } from 'styled-components';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { InputPassword } from '../../components/InputPassword';
@@ -46,10 +47,6 @@ export function SignIn() {
         const message = formatMessagesYup(error);
         return Alert.alert('Opa!', message);
       }
-      Alert.alert(
-        'Erro na autenticação',
-        'Ocorreu um erro ao fazer o login, verique as credenciais',
-      );
     }
   }
 

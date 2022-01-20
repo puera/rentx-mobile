@@ -91,7 +91,6 @@ export function Home() {
   });
 
   function handleCarDetails(car: CarsDTO) {
-    console.log('chegou aqui');
     navigation.navigate('CarDetails', { car });
   }
 
@@ -112,11 +111,12 @@ export function Home() {
       } finally {
         if (isMounted) setLoading(false);
       }
-      return () => {
-        isMounted = false;
-      };
     }
     fetchCars();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useFocusEffect(() => {
