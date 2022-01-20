@@ -91,6 +91,7 @@ export function Home() {
   });
 
   function handleCarDetails(car: CarsDTO) {
+    console.log('chegou aqui');
     navigation.navigate('CarDetails', { car });
   }
 

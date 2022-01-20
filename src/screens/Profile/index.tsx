@@ -1,6 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
 import {
@@ -29,6 +28,7 @@ import {
 import { Input } from '../../components/Input';
 import { useAuth } from '../../hooks/auth';
 import { InputPassword } from '../../components/InputPassword';
+import { Button } from '../../components/Button';
 
 export function Profile() {
   const [option, setOption] = useState<'dataEdit' | 'passwordEdit'>('dataEdit');
@@ -47,54 +47,48 @@ export function Profile() {
 
   return (
     <KeyboardAvoidingView behavior="position">
-      <TouchableWithoutFeedback onPress={() => console.log('teste')}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Container>
           <Header>
             <HeaderTop>
               <BackButton
                 color={theme.colors.shape}
-                onPress={() => console.log('volta')}
+                onPress={() => navigation.goBack()}
               />
               <HeaderTitle>Editar Perfil</HeaderTitle>
-              <LogoutButton onPress={() => console.log('deslogou')} />
-              <Feather name="power" size={24} color={theme.colors.shape} />
+              <LogoutButton onPress={() => console.log('logout')}>
+                <Feather name="power" size={24} color={theme.colors.shape} />
+              </LogoutButton>
             </HeaderTop>
             <PhotoContainer>
-              <Photo
-                source={{
-                  uri: 'https://avatars.githubusercontent.com/u/1524415?v=4',
-                }}
-              />
-              <PhotoButton onPress={() => console.log('CHEGOU')}>
+              <Photo source={{ uri: 'https://github.com/puera.png' }} />
+              <PhotoButton onPress={() => console.log('photo')}>
                 <Feather name="camera" size={24} color={theme.colors.shape} />
               </PhotoButton>
             </PhotoContainer>
           </Header>
-
           <Content style={{ marginBottom: useBottomTabBarHeight() }}>
             <Options>
               <Option
-                onPress={() => handleOptionChange('dataEdit')}
                 active={option === 'dataEdit'}
+                onPress={() => handleOptionChange('dataEdit')}
               >
                 <OptionTitle active={option === 'dataEdit'}>Dados</OptionTitle>
               </Option>
               <Option
-                onPress={() => handleOptionChange('passwordEdit')}
                 active={option === 'passwordEdit'}
+                onPress={() => handleOptionChange('passwordEdit')}
               >
                 <OptionTitle active={option === 'passwordEdit'}>
                   Trocar Senha
                 </OptionTitle>
               </Option>
             </Options>
-
             {option === 'dataEdit' ? (
               <Section>
                 <Input
                   iconName="user"
                   placeholder="Nome"
-                  autoCapitalize="none"
                   autoCorrect={false}
                   defaultValue={user.name}
                 />
@@ -112,14 +106,15 @@ export function Profile() {
               </Section>
             ) : (
               <Section>
-                <InputPassword iconName="lock" placeholder="Senha atual" />
-                <InputPassword iconName="lock" placeholder="Nova senha" />
-                <InputPassword
-                  iconName="lock"
-                  placeholder="Repetir nova senha"
-                />
+                <InputPassword iconName="lock" placeholder="Senha Atual" />
+                <InputPassword iconName="lock" placeholder="Nova Senha" />
+                <InputPassword iconName="lock" placeholder="Repetir Senha" />
               </Section>
             )}
+            <Button
+              title="Salvar alterações"
+              onPress={() => console.log('botao')}
+            />
           </Content>
         </Container>
       </TouchableWithoutFeedback>
