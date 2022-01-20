@@ -18,10 +18,8 @@ import {
 type CarProps = {
   brand: string;
   name: string;
-  rent: {
-    period: string;
-    price: number;
-  };
+  period: string;
+  price: number;
   thumbnail: string;
   fuel_type: string;
 } & RectButtonProps;
@@ -29,7 +27,8 @@ type CarProps = {
 export function Car({
   name,
   brand,
-  rent,
+  period,
+  price,
   thumbnail,
   fuel_type,
   ...rest
@@ -43,8 +42,8 @@ export function Car({
 
         <About>
           <Rent>
-            <Period>{rent.period}</Period>
-            <Price>{`R$ ${rent.price}`}</Price>
+            <Period>{period}</Period>
+            <Price>{`R$ ${price}`}</Price>
           </Rent>
 
           <Type>

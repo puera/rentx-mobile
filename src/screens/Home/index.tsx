@@ -21,6 +21,7 @@ import { LoadingAnimated } from '../../LoadingAnimated';
 const ButtonAnimated = Animated.createAnimatedComponent(RectButton);
 
 interface AccessoriesProps {
+  id: string;
   type: string;
   name: string;
 }
@@ -30,14 +31,15 @@ export interface CarsDTO {
   brand: string;
   name: string;
   about: string;
-  rent: {
-    period: string;
-    price: number;
-  };
+  period: string;
+  price: number;
   fuel_type: string;
   thumbnail: string;
   accessories: AccessoriesProps[];
-  photos: string[];
+  photos: {
+    id: string;
+    photo: string;
+  }[];
 }
 
 const styles = StyleSheet.create({
@@ -97,17 +99,21 @@ export function Home() {
   }
 
   useEffect(() => {
+    let isMounted = true;
     async function fetchCars() {
       try {
-        setLoading(true);
+        if (isMounted) setLoading(true);
         const response = await api.get<CarsDTO[]>('cars');
 
-        setCars(response.data);
+        if (isMounted) setCars(response.data);
       } catch (error) {
         console.log(error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
+      return () => {
+        isMounted = false;
+      };
     }
     fetchCars();
   }, []);
@@ -139,7 +145,8 @@ export function Home() {
             <Car
               brand={item.brand}
               name={item.name}
-              rent={item.rent}
+              period={item.period}
+              price={item.price}
               thumbnail={item.thumbnail}
               fuel_type={item.fuel_type}
               onPress={() => handleCarDetails(item)}
