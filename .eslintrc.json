@@ -24,6 +24,8 @@
         "prettier"
     ],
     "rules": {
+      "no-underscore-dangle": "off",
+      "no-param-reassign": "off",
       "react/no-unstable-nested-components": "off",
       "react/jsx-no-constructed-context-values": "off",
       "consistent-return": "off",

@@ -3,6 +3,7 @@ import { Feather } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
@@ -35,7 +36,7 @@ export function Profile() {
 
   const theme = useTheme();
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   function handleOptionChange(optionSelected: 'dataEdit' | 'passwordEdit') {
     setOption(optionSelected);
@@ -43,6 +44,18 @@ export function Profile() {
 
   async function handleChangeAvatar() {
     console.log('chegou aqui');
+  }
+
+  async function handleSignOut() {
+    Alert.alert('Opa!', 'Deseja realmente deslogar do App?', [
+      {
+        text: 'Sim',
+        onPress: () => signOut(),
+      },
+      {
+        text: 'Não',
+      },
+    ]);
   }
 
   return (
@@ -56,12 +69,21 @@ export function Profile() {
                 onPress={() => navigation.goBack()}
               />
               <HeaderTitle>Editar Perfil</HeaderTitle>
-              <LogoutButton onPress={() => console.log('logout')}>
+              <LogoutButton onPress={handleSignOut}>
                 <Feather name="power" size={24} color={theme.colors.shape} />
               </LogoutButton>
             </HeaderTop>
             <PhotoContainer>
-              <Photo source={{ uri: 'https://github.com/puera.png' }} />
+              {user.avatar ? (
+                <Photo source={{ uri: user.avatar }} />
+              ) : (
+                <Photo
+                  resizeMode="contain"
+                  source={{
+                    uri: `https://ui-avatars.com/api/?name=${user.name}`,
+                  }}
+                />
+              )}
               <PhotoButton onPress={() => console.log('photo')}>
                 <Feather name="camera" size={24} color={theme.colors.shape} />
               </PhotoButton>

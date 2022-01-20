@@ -1,5 +1,13 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import { database } from '../database';
 import { api } from '../services/api';
+import { User as ModelUser } from '../database/models/User';
 
 interface User {
   id: string;
@@ -18,6 +26,7 @@ interface SignInCrendentials {
 interface AuthContextData {
   user: User;
   signIn: (credentials: SignInCrendentials) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 interface AuthContextProps {
@@ -33,7 +42,20 @@ export function AuthProvider({ children }: AuthContextProps) {
     try {
       const response = await api.post('sessions', { email, password });
       const { user, token } = response.data;
+
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
+
+      const userCollection = database.get<ModelUser>('users');
+      await database.write(async () => {
+        await userCollection.create((newUser) => {
+          newUser.user_id = user.id;
+          newUser.name = user.name;
+          newUser.email = user.email;
+          newUser.avatar = user.avatar;
+          newUser.driver_license = user.driver_license;
+          newUser.token = token;
+        });
+      });
 
       setData({ ...user, token });
     } catch (error) {
@@ -41,8 +63,28 @@ export function AuthProvider({ children }: AuthContextProps) {
     }
   }
 
+  async function signOut() {
+    await database.write(async () => {
+      await database.unsafeResetDatabase();
+    });
+    setData({} as User);
+  }
+
+  useEffect(() => {
+    (async () => {
+      const userCollection = database.get<ModelUser>('users');
+      const response = await userCollection.query().fetch();
+
+      if (response.length > 0) {
+        const userData = response[0]._raw as unknown as User;
+        api.defaults.headers.common.Authorization = `Bearer ${userData.token}`;
+        setData(userData);
+      }
+    })();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ signIn, user: data }}>
+    <AuthContext.Provider value={{ signIn, signOut, user: data }}>
       {children}
     </AuthContext.Provider>
   );
