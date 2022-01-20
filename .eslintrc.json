@@ -24,6 +24,7 @@
         "prettier"
     ],
     "rules": {
+      "react/jsx-no-constructed-context-values": "off",
       "consistent-return": "off",
       "react/jsx-no-bind": "off",
       "react/require-default-props": "off",

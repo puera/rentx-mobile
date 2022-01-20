@@ -17,6 +17,7 @@ import { InputPassword } from '../../components/InputPassword';
 
 import { Container, Header, SubTitle, Title, Form, Footer } from './styles';
 import { formatMessagesYup } from '../../utils/formatMessagesYup';
+import { useAuth } from '../../hooks/auth';
 
 export function SignIn() {
   const passwordRef = useRef<TextInput>(null);
@@ -26,6 +27,7 @@ export function SignIn() {
 
   const theme = useTheme();
   const navigation = useNavigation();
+  const { signIn } = useAuth();
 
   async function handleSignIn() {
     try {
@@ -37,16 +39,17 @@ export function SignIn() {
       });
 
       await schema.validate({ email, password }, { abortEarly: false });
+
+      await signIn({ email, password });
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const message = formatMessagesYup(error);
-        Alert.alert('Opa!', message);
-      } else {
-        Alert.alert(
-          'Erro na autenticação',
-          'Ocorreu um erro ao fazer o login, verique as credenciais',
-        );
+        return Alert.alert('Opa!', message);
       }
+      Alert.alert(
+        'Erro na autenticação',
+        'Ocorreu um erro ao fazer o login, verique as credenciais',
+      );
     }
   }
 
