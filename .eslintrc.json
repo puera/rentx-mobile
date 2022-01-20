@@ -24,6 +24,7 @@
         "prettier"
     ],
     "rules": {
+      "react/no-unstable-nested-components": "off",
       "react/jsx-no-constructed-context-values": "off",
       "consistent-return": "off",
       "react/jsx-no-bind": "off",
