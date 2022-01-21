@@ -6,7 +6,7 @@ import { Container, Content, Title, Message, Footer } from './styles';
 import LogoSvg from '../../assets/logo_background_gray.svg';
 import DoneSvg from '../../assets/done.svg';
 import { ButtonConfirmation } from '../../components/ButtonConfirmation';
-import { ConfirmationProps } from '../../routes/stack.routes';
+import { ConfirmationProps } from '../../routes/app.stack.routes';
 
 export function Confirmation() {
   const { width } = useWindowDimensions();
