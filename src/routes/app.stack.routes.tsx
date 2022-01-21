@@ -1,13 +1,14 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { CarsDTO, Home } from '../screens/Home';
+import { Home } from '../screens/Home';
 import { CarDetails } from '../screens/CarDetails';
 import { Scheduling } from '../screens/Scheduling';
 import { SchedulingDetails } from '../screens/SchedulingDetails';
 import { MyCars } from '../screens/MyCars';
 import { Confirmation } from '../screens/Confirmation';
-import { Splash } from '../screens/Splash';
+
+import { Car } from '../database/models/Car';
 
 export interface SignUpSecondStepProps {
   name: string;
@@ -27,13 +28,13 @@ export interface AppRoutesParamList {
   SignUpSecondStep: SignUpSecondStepProps;
   Home: undefined;
   CarDetails: {
-    car: CarsDTO;
+    car: Car;
   };
   Scheduling: {
-    car: CarsDTO;
+    car: Car;
   };
   SchedulingDetails: {
-    car: CarsDTO;
+    car: Car;
     dates: string[];
   };
   Confirmation: ConfirmationProps;

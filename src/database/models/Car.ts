@@ -19,7 +19,7 @@ export class Car extends Model {
   @field('period')
   period: string;
 
-  @field('token')
+  @field('price')
   price: number;
 
   @field('thumbnail')
