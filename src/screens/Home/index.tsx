@@ -168,7 +168,7 @@ export function Home() {
         translucent
       />
       <Header quantityCars={cars.length} loading={loading} />
-      <Button title="Sincronizar" onPress={offlineSynchronize} />
+      {/* <Button title="Sincronizar" onPress={offlineSynchronize} /> */}
       {loading ? (
         <LoadingAnimated />
       ) : (

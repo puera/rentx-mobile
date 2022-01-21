@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { BackButton } from '../../components/BackButton';
 
 import {
@@ -44,9 +45,14 @@ export function Profile() {
 
   const theme = useTheme();
   const navigation = useNavigation();
+  const netInfo = useNetInfo();
 
   function handleOptionChange(optionSelected: 'dataEdit' | 'passwordEdit') {
-    setOption(optionSelected);
+    if (!netInfo.isConnected && optionSelected === 'passwordEdit') {
+      Alert.alert('Opa!', 'Para mudar a senha, conecte-se a internet');
+    } else {
+      setOption(optionSelected);
+    }
   }
 
   async function handleChangeAvatar() {
