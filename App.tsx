@@ -19,6 +19,7 @@ import { AppProvider } from './src/hooks';
 
 LogBox.ignoreLogs([
   "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
+  'Non-serializable values were found in the navigation state',
 ]);
 
 export default function App() {
