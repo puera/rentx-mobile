@@ -2,16 +2,18 @@ import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTheme } from 'styled-components';
 import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
+  TextInput,
   TouchableWithoutFeedback,
 } from 'react-native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useNetInfo } from '@react-native-community/netinfo';
+import axios from 'axios';
 import { BackButton } from '../../components/BackButton';
 
 import {
@@ -34,14 +36,24 @@ import { useAuth } from '../../hooks/auth';
 import { InputPassword } from '../../components/InputPassword';
 import { Button } from '../../components/Button';
 import { formatMessagesYup } from '../../utils/formatMessagesYup';
+import { api } from '../../services/api';
 
 export function Profile() {
+  const cnhRef = useRef<TextInput>(null);
+
+  const newPasswordRef = useRef<TextInput>(null);
+  const confirmPaswordRef = useRef<TextInput>(null);
+
   const { user, signOut, updateUser } = useAuth();
 
   const [option, setOption] = useState<'dataEdit' | 'passwordEdit'>('dataEdit');
   const [avatar, setAvatar] = useState(user.avatar);
   const [name, setName] = useState(user.name);
   const [driverLicense, setDriverLicense] = useState(user.driver_license);
+
+  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const theme = useTheme();
   const navigation = useNavigation();
@@ -82,29 +94,93 @@ export function Profile() {
   }
 
   async function handleProfileUpdate() {
-    try {
-      const schema = Yup.object({
-        driverLicense: Yup.string().required('CNH é obrigatória'),
-        name: Yup.string().required('Nome é Obrigatório'),
-      });
-      await schema.validate({ name, driverLicense }, { abortEarly: false });
+    if (option === 'dataEdit') {
+      try {
+        const schema = Yup.object({
+          driverLicense: Yup.string().required('CNH é obrigatória'),
+          name: Yup.string().required('Nome é Obrigatório'),
+        });
+        await schema.validate({ name, driverLicense }, { abortEarly: false });
 
-      await updateUser({
-        id: user.id,
-        user_id: user.user_id,
-        email: user.email,
-        name,
-        driver_license: driverLicense,
-        avatar,
-        token: user.token,
-      });
+        await updateUser({
+          id: user.id,
+          user_id: user.user_id,
+          email: user.email,
+          name,
+          driver_license: driverLicense,
+          avatar,
+          token: user.token,
+        });
 
-      Alert.alert('Perfil atualizado com sucesso!');
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        const message = formatMessagesYup(error);
-        Alert.alert('Opa!', message);
-      } else Alert.alert('Opa!', 'Algo deu errado, tente novamente mais tarde');
+        Alert.alert('Perfil atualizado com sucesso!');
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const message = formatMessagesYup(error);
+          Alert.alert('Opa!', message);
+        } else
+          Alert.alert('Opa!', 'Algo deu errado, tente novamente mais tarde');
+      }
+    } else {
+      try {
+        const schema = Yup.object({
+          password: Yup.string(),
+          newPassword: Yup.string().when('password', {
+            is: (value) => !!value.length,
+            then: Yup.string().required('Nova senha é obrigatória'),
+            otherwise: Yup.string(),
+          }),
+          confirmPassword: Yup.string()
+            .when('password', {
+              is: (value) => !!value.length,
+              then: Yup.string().required('Repetir senha é obrigatória'),
+              otherwise: Yup.string(),
+            })
+            .oneOf(
+              [Yup.ref('newPassword'), null],
+              'Repetir senha não é igual a nova senha',
+            ),
+        });
+
+        await schema.validate(
+          { password, newPassword, confirmPassword },
+          { abortEarly: false },
+        );
+
+        await api.put('users/change-password  ', {
+          password,
+          new_password: newPassword,
+        });
+
+        Alert.alert(
+          'Tudo certo!',
+          'Sua senha foi trocada com sucesso! Você será deslogado',
+          [
+            {
+              text: 'Sim',
+              onPress: () => signOut(),
+            },
+          ],
+        );
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const message = formatMessagesYup(error);
+          Alert.alert('Opa!', message);
+        } else if (axios.isAxiosError(error)) {
+          if (
+            error.response.data.message.toLowerCase() ===
+            'old password does not match'
+          )
+            return Alert.alert(
+              'Opa!',
+              'Sua senha antiga foi digitado incorretamente!',
+            );
+        } else {
+          return Alert.alert(
+            'Opa!',
+            'Algum problema acontenceu, tente novamente mais tarde',
+          );
+        }
+      }
     }
   }
 
@@ -164,6 +240,8 @@ export function Profile() {
                   autoCorrect={false}
                   defaultValue={user.name}
                   onChangeText={setName}
+                  returnKeyType="next"
+                  onSubmitEditing={cnhRef.current?.focus}
                 />
                 <Input
                   iconName="mail"
@@ -171,21 +249,52 @@ export function Profile() {
                   defaultValue={user.email}
                 />
                 <Input
+                  ref={cnhRef}
                   iconName="credit-card"
                   placeholder="CNH"
                   keyboardType="numeric"
                   defaultValue={user.driver_license}
                   onChangeText={setDriverLicense}
+                  returnKeyType="send"
+                  onSubmitEditing={handleProfileUpdate}
                 />
               </Section>
             ) : (
               <Section>
-                <InputPassword iconName="lock" placeholder="Senha Atual" />
-                <InputPassword iconName="lock" placeholder="Nova Senha" />
-                <InputPassword iconName="lock" placeholder="Repetir Senha" />
+                <InputPassword
+                  iconName="lock"
+                  placeholder="Senha Atual"
+                  onChangeText={setPassword}
+                  returnKeyType="next"
+                  onSubmitEditing={newPasswordRef.current?.focus}
+                />
+                <InputPassword
+                  ref={newPasswordRef}
+                  iconName="lock"
+                  placeholder="Nova Senha"
+                  onChangeText={setNewPassword}
+                  returnKeyType="next"
+                  onSubmitEditing={confirmPaswordRef.current?.focus}
+                />
+                <InputPassword
+                  ref={confirmPaswordRef}
+                  iconName="lock"
+                  placeholder="Repetir Senha"
+                  returnKeyType="send"
+                  onSubmitEditing={handleProfileUpdate}
+                  onChangeText={setConfirmPassword}
+                />
               </Section>
             )}
-            <Button title="Salvar alterações" onPress={handleProfileUpdate} />
+            <Button
+              enabled={
+                option === 'dataEdit'
+                  ? true
+                  : !!(option === 'passwordEdit' && !!password)
+              }
+              title="Salvar alterações"
+              onPress={handleProfileUpdate}
+            />
           </Content>
         </Container>
       </TouchableWithoutFeedback>

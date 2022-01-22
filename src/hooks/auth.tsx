@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import axios from 'axios';
 import { Alert } from 'react-native';
+import { synchronize } from '@nozbe/watermelondb/sync';
 import { database } from '../database';
 import { api } from '../services/api';
 import { User as ModelUser } from '../database/models/User';
@@ -31,6 +32,7 @@ interface AuthContextData {
   signIn: (credentials: SignInCrendentials) => Promise<void>;
   signOut: () => Promise<void>;
   updateUser: (user: User) => Promise<void>;
+  offlineSynchronize: () => Promise<void>;
   loading: boolean;
 }
 
@@ -124,24 +126,63 @@ export function AuthProvider({ children }: AuthContextProps) {
     }
   }
 
+  async function offlineSynchronize() {
+    console.log('SYNC');
+    try {
+      await synchronize({
+        database,
+        pullChanges: async ({ lastPulledAt }) => {
+          const response = await api.get(
+            `cars/sync/pull?lastPulledVersion=${lastPulledAt || 0}`,
+          );
+
+          const { changes, latestVersion } = response.data;
+          return {
+            changes,
+            timestamp: latestVersion,
+          };
+        },
+        pushChanges: async ({ changes }) => {
+          const user = changes.users;
+          await api.post('users/sync', user);
+        },
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   useEffect(() => {
-    (async () => {
-      const userCollection = database.get<ModelUser>('users');
-      const response = await userCollection.query().fetch();
+    try {
+      (async () => {
+        setLoading(true);
+        const userCollection = database.get<ModelUser>('users');
+        const response = await userCollection.query().fetch();
 
-      if (response.length > 0) {
-        const userData = response[0]._raw as unknown as User;
-        api.defaults.headers.common.Authorization = `Bearer ${userData.token}`;
+        if (response.length > 0) {
+          const userData = response[0]._raw as unknown as User;
+          api.defaults.headers.common.Authorization = `Bearer ${userData.token}`;
 
-        setData(userData);
-        setLoading(false);
-      }
-    })();
+          setData(userData);
+        }
+      })();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ loading, signIn, signOut, updateUser, user: data }}
+      value={{
+        loading,
+        signIn,
+        signOut,
+        updateUser,
+        offlineSynchronize,
+        user: data,
+      }}
     >
       {children}
     </AuthContext.Provider>

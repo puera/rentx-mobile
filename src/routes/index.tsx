@@ -8,9 +8,7 @@ import { LoadingAnimated } from '../LoadingAnimated';
 
 export function Routes() {
   const { user, loading } = useAuth();
-  return loading ? (
-    <LoadingAnimated />
-  ) : (
+  return (
     <NavigationContainer>
       {user.id ? <AppTabRoutes /> : <AuthRoutes />}
     </NavigationContainer>

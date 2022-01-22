@@ -73,7 +73,7 @@ const InputPasswordFoward: ForwardRefRenderFunction<InputRef, InputProps> = (
       >
         <IconContainer isFocused={isFocused}>
           <Feather
-            name={isPasswordVisible ? 'eye-off' : 'eye'}
+            name={isPasswordVisible ? 'eye' : 'eye-off'}
             size={24}
             color={theme.colors.text_detail}
           />
