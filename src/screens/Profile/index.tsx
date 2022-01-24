@@ -8,6 +8,7 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
+  ScrollView,
   TextInput,
   TouchableWithoutFeedback,
 } from 'react-native';
@@ -215,87 +216,91 @@ export function Profile() {
               </PhotoButton>
             </PhotoContainer>
           </Header>
-          <Content style={{ marginBottom: useBottomTabBarHeight() }}>
-            <Options>
-              <Option
-                active={option === 'dataEdit'}
-                onPress={() => handleOptionChange('dataEdit')}
-              >
-                <OptionTitle active={option === 'dataEdit'}>Dados</OptionTitle>
-              </Option>
-              <Option
-                active={option === 'passwordEdit'}
-                onPress={() => handleOptionChange('passwordEdit')}
-              >
-                <OptionTitle active={option === 'passwordEdit'}>
-                  Trocar Senha
-                </OptionTitle>
-              </Option>
-            </Options>
-            {option === 'dataEdit' ? (
-              <Section>
-                <Input
-                  iconName="user"
-                  placeholder="Nome"
-                  autoCorrect={false}
-                  defaultValue={user.name}
-                  onChangeText={setName}
-                  returnKeyType="next"
-                  onSubmitEditing={cnhRef.current?.focus}
-                />
-                <Input
-                  iconName="mail"
-                  editable={false}
-                  defaultValue={user.email}
-                />
-                <Input
-                  ref={cnhRef}
-                  iconName="credit-card"
-                  placeholder="CNH"
-                  keyboardType="numeric"
-                  defaultValue={user.driver_license}
-                  onChangeText={setDriverLicense}
-                  returnKeyType="send"
-                  onSubmitEditing={handleProfileUpdate}
-                />
-              </Section>
-            ) : (
-              <Section>
-                <InputPassword
-                  iconName="lock"
-                  placeholder="Senha Atual"
-                  onChangeText={setPassword}
-                  returnKeyType="next"
-                  onSubmitEditing={newPasswordRef.current?.focus}
-                />
-                <InputPassword
-                  ref={newPasswordRef}
-                  iconName="lock"
-                  placeholder="Nova Senha"
-                  onChangeText={setNewPassword}
-                  returnKeyType="next"
-                  onSubmitEditing={confirmPaswordRef.current?.focus}
-                />
-                <InputPassword
-                  ref={confirmPaswordRef}
-                  iconName="lock"
-                  placeholder="Repetir Senha"
-                  returnKeyType="send"
-                  onSubmitEditing={handleProfileUpdate}
-                  onChangeText={setConfirmPassword}
-                />
-              </Section>
-            )}
-            <Button
-              enabled={
-                option === 'dataEdit'
-                  ? true
-                  : !!(option === 'passwordEdit' && !!password)
-              }
-              title="Salvar alterações"
-              onPress={handleProfileUpdate}
-            />
-          </Content>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Content style={{ marginBottom: useBottomTabBarHeight() }}>
+              <Options>
+                <Option
+                  active={option === 'dataEdit'}
+                  onPress={() => handleOptionChange('dataEdit')}
+                >
+                  <OptionTitle active={option === 'dataEdit'}>
+                    Dados
+                  </OptionTitle>
+                </Option>
+                <Option
+                  active={option === 'passwordEdit'}
+                  onPress={() => handleOptionChange('passwordEdit')}
+                >
+                  <OptionTitle active={option === 'passwordEdit'}>
+                    Trocar Senha
+                  </OptionTitle>
+                </Option>
+              </Options>
+              {option === 'dataEdit' ? (
+                <Section>
+                  <Input
+                    iconName="user"
+                    placeholder="Nome"
+                    autoCorrect={false}
+                    defaultValue={user.name}
+                    onChangeText={setName}
+                    returnKeyType="next"
+                    onSubmitEditing={cnhRef.current?.focus}
+                  />
+                  <Input
+                    iconName="mail"
+                    editable={false}
+                    defaultValue={user.email}
+                  />
+                  <Input
+                    ref={cnhRef}
+                    iconName="credit-card"
+                    placeholder="CNH"
+                    keyboardType="numeric"
+                    defaultValue={user.driver_license}
+                    onChangeText={setDriverLicense}
+                    returnKeyType="send"
+                    onSubmitEditing={handleProfileUpdate}
+                  />
+                </Section>
+              ) : (
+                <Section>
+                  <InputPassword
+                    iconName="lock"
+                    placeholder="Senha Atual"
+                    onChangeText={setPassword}
+                    returnKeyType="next"
+                    onSubmitEditing={newPasswordRef.current?.focus}
+                  />
+                  <InputPassword
+                    ref={newPasswordRef}
+                    iconName="lock"
+                    placeholder="Nova Senha"
+                    onChangeText={setNewPassword}
+                    returnKeyType="next"
+                    onSubmitEditing={confirmPaswordRef.current?.focus}
+                  />
+                  <InputPassword
+                    ref={confirmPaswordRef}
+                    iconName="lock"
+                    placeholder="Repetir Senha"
+                    returnKeyType="send"
+                    onSubmitEditing={handleProfileUpdate}
+                    onChangeText={setConfirmPassword}
+                  />
+                </Section>
+              )}
+              <Button
+                enabled={
+                  option === 'dataEdit'
+                    ? true
+                    : !!(option === 'passwordEdit' && !!password)
+                }
+                title="Salvar alterações"
+                onPress={handleProfileUpdate}
+              />
+            </Content>
+          </ScrollView>
         </Container>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

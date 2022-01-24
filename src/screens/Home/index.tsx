@@ -21,6 +21,8 @@ import { LoadingAnimated } from '../../LoadingAnimated';
 import { Car as ModelCar } from '../../database/models/Car';
 import { useAuth } from '../../hooks/auth';
 
+import { api } from '../../services/api';
+
 const ButtonAnimated = Animated.createAnimatedComponent(RectButton);
 
 interface AccessoriesProps {
@@ -113,6 +115,11 @@ export function Home() {
         const carCollection = database.get<ModelCar>('cars');
 
         const getCars = await carCollection.query().fetch();
+
+        if (!getCars.length) {
+          const response = await api.get('cars');
+          return setCars(response.data);
+        }
         if (isMounted) setCars(getCars);
       } catch (error) {
         console.log(error);

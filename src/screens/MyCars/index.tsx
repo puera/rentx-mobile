@@ -1,9 +1,10 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, StatusBar } from 'react-native';
+import { Alert, FlatList, StatusBar } from 'react-native';
 import { useTheme } from 'styled-components';
 import { format, parseISO } from 'date-fns';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { BackButton } from '../../components/BackButton';
 import { Car } from '../../components/Car';
 import { api } from '../../services/api';
@@ -43,22 +44,23 @@ export function MyCars() {
   const navigation = useNavigation();
 
   const fetchMyCars = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('rentals');
-      const dataFormatted = response.data.map((data: DataProps) => ({
-        id: data.id,
-        car: data.car,
-        start_date: format(parseISO(data.start_date), 'dd/MM/yyyy'),
-        end_date: format(parseISO(data.end_date), 'dd/MM/yyyy'),
-      }));
-      setCars(dataFormatted);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+    if (isFocused) {
+      try {
+        setLoading(true);
+        const response = await api.get('rentals');
+        const dataFormatted = response.data.map((data: DataProps) => ({
+          id: data.id,
+          car: data.car,
+          start_date: format(parseISO(data.start_date), 'dd/MM/yyyy'),
+          end_date: format(parseISO(data.end_date), 'dd/MM/yyyy'),
+        }));
+        setCars(dataFormatted);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocused]);
 
   useEffect(() => {
