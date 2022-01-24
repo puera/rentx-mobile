@@ -25,7 +25,7 @@ import {
 } from '../../components/Calendar';
 import { generateinterval } from '../../components/Calendar/generateinterval';
 import { getPlattformDate } from '../../utils/getPlattformDate';
-import { CarsDTO } from '../Home';
+import { Car } from '../../database/models/Car';
 
 interface RentalPeriod {
   start: number;
@@ -35,7 +35,7 @@ interface RentalPeriod {
 }
 
 interface Params {
-  car: CarsDTO;
+  car: Car;
 }
 
 export function Scheduling() {

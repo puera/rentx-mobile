@@ -11,12 +11,20 @@ import {
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { useTheme } from 'styled-components';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { InputPassword } from '../../components/InputPassword';
 
-import { Container, Header, SubTitle, Title, Form, Footer } from './styles';
+import {
+  Container,
+  Header,
+  SubTitle,
+  Title,
+  Form,
+  Footer,
+  OfflineInfo,
+} from './styles';
 import { formatMessagesYup } from '../../utils/formatMessagesYup';
 import { useAuth } from '../../hooks/auth';
 
@@ -29,6 +37,7 @@ export function SignIn() {
   const theme = useTheme();
   const navigation = useNavigation();
   const { signIn } = useAuth();
+  const netInfo = useNetInfo();
 
   async function handleSignIn() {
     try {
@@ -91,12 +100,18 @@ export function SignIn() {
             />
           </Form>
 
+          {netInfo.isConnected === false && (
+            <OfflineInfo>
+              Conecte-se a internet para logar ou criar a conta.
+            </OfflineInfo>
+          )}
+
           <Footer>
             <View style={{ marginBottom: 8 }}>
               <Button
                 title="Login"
                 onPress={handleSignIn}
-                enabled
+                enabled={!!netInfo.isConnected}
                 loading={false}
               />
             </View>
@@ -105,7 +120,7 @@ export function SignIn() {
               onPress={() => navigation.navigate('SignUpFirstStep')}
               light
               color={theme.colors.background_secondary}
-              enabled
+              enabled={!!netInfo.isConnected}
               loading={false}
             />
           </Footer>

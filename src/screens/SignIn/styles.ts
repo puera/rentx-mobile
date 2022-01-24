@@ -36,4 +36,15 @@ export const Form = styled.View`
   margin: 64px 0;
 `;
 
-export const Footer = styled.View``;
+export const OfflineInfo = styled.Text`
+  ${({ theme }) => css`
+    font-family: ${theme.fonts.primary_400};
+    color: ${theme.colors.main};
+  `}
+  font-size: ${RFValue(10)}px;
+  text-align: center;
+`;
+
+export const Footer = styled.View`
+  margin-top: 16px;
+`;
