@@ -3,6 +3,7 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import axios from 'axios';
@@ -45,6 +46,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export function AuthProvider({ children }: AuthContextProps) {
   const [data, setData] = useState<User>({} as User);
   const [loading, setLoading] = useState(true);
+  const synchronizing = useRef(false);
 
   async function signIn({ email, password }: SignInCrendentials) {
     try {
@@ -128,27 +130,32 @@ export function AuthProvider({ children }: AuthContextProps) {
 
   async function offlineSynchronize() {
     console.log('SYNC');
-    try {
-      await synchronize({
-        database,
-        pullChanges: async ({ lastPulledAt }) => {
-          const response = await api.get(
-            `cars/sync/pull?lastPulledVersion=${lastPulledAt || 0}`,
-          );
+    if (!synchronizing.current) {
+      synchronizing.current = true;
+      try {
+        await synchronize({
+          database,
+          pullChanges: async ({ lastPulledAt }) => {
+            const response = await api.get(
+              `cars/sync/pull?lastPulledVersion=${lastPulledAt || 0}`,
+            );
 
-          const { changes, latestVersion } = response.data;
-          return {
-            changes,
-            timestamp: latestVersion,
-          };
-        },
-        pushChanges: async ({ changes }) => {
-          const user = changes.users;
-          await api.post('users/sync', user);
-        },
-      });
-    } catch (error) {
-      throw new Error(error);
+            const { changes, latestVersion } = response.data;
+            return {
+              changes,
+              timestamp: latestVersion,
+            };
+          },
+          pushChanges: async ({ changes }) => {
+            const user = changes.users;
+            await api.post('users/sync', user);
+          },
+        });
+      } catch (error) {
+        throw new Error(error);
+      } finally {
+        synchronizing.current = false;
+      }
     }
   }
 
