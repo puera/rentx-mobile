@@ -35,6 +35,8 @@ interface AuthContextData {
   updateUser: (user: User) => Promise<void>;
   offlineSynchronize: () => Promise<void>;
   loading: boolean;
+  optionBio: boolean;
+  handleOptionBio: (args: boolean) => void;
 }
 
 interface AuthContextProps {
@@ -47,6 +49,11 @@ export function AuthProvider({ children }: AuthContextProps) {
   const [data, setData] = useState<User>({} as User);
   const [loading, setLoading] = useState(true);
   const synchronizing = useRef(false);
+  const [optionBio, setOptionBio] = useState(false);
+
+  function handleOptionBio(args: boolean) {
+    setOptionBio(args);
+  }
 
   async function signIn({ email, password }: SignInCrendentials) {
     try {
@@ -188,6 +195,8 @@ export function AuthProvider({ children }: AuthContextProps) {
         signOut,
         updateUser,
         offlineSynchronize,
+        handleOptionBio,
+        optionBio,
         user: data,
       }}
     >

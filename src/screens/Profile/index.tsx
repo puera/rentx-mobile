@@ -68,7 +68,7 @@ export function Profile() {
     }
   }
 
-  async function handleChangeAvatar() {
+  async function handleGalery() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -80,6 +80,36 @@ export function Profile() {
       const { uri } = result as ImagePicker.ImageInfo;
       setAvatar(uri);
     }
+  }
+
+  async function handleCamera() {
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      const { uri } = result as ImagePicker.ImageInfo;
+      setAvatar(uri);
+    }
+  }
+
+  async function handleChangeAvatar() {
+    Alert.alert('Opa!', 'Escolha uma opção desejada', [
+      {
+        text: 'Galeria',
+        onPress: () => handleGalery(),
+      },
+      {
+        text: 'Câmera',
+        onPress: () => handleCamera(),
+      },
+      {
+        text: 'Cancelar',
+      },
+    ]);
   }
 
   async function handleSignOut() {

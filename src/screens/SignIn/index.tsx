@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import * as LocalAuthetication from 'expo-local-authentication';
 import * as Yup from 'yup';
 import {
   Alert,
@@ -29,6 +30,7 @@ import { formatMessagesYup } from '../../utils/formatMessagesYup';
 import { useAuth } from '../../hooks/auth';
 
 export function SignIn() {
+  const { user, handleOptionBio } = useAuth();
   const passwordRef = useRef<TextInput>(null);
 
   const [email, setEmail] = useState('');
@@ -58,6 +60,18 @@ export function SignIn() {
       }
     }
   }
+
+  useEffect(() => {
+    (async () => {
+      const compatible = await LocalAuthetication.hasHardwareAsync();
+
+      if (user.id && compatible) {
+        const result = await LocalAuthetication.authenticateAsync();
+
+        if (result.success) return handleOptionBio(true);
+      }
+    })();
+  }, [user.id, handleOptionBio]);
 
   return (
     <KeyboardAvoidingView behavior="position">
